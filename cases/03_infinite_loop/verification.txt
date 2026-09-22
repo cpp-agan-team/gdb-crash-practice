@@ -1,0 +1,40 @@
+Verified UTC: 2026-09-21T17:32:12.438039+00:00
+Environment: WSL Ubuntu-24.04, g++ 13.3.0, GDB 15.1
+Compile flags: -std=c++17 -O0 -g3 -fno-omit-frame-pointer -Wall -Wextra -Wpedantic -pthread
+Default and FIX_BUG builds: exit=0, no compiler diagnostics
+GDB command: gdb -q -nx -batch -x cases/03_infinite_loop/inspect.gdb --args build/03_infinite_loop
+first actual interrupt: index=3 checksum=28 zero_hits=133797008
+second actual interrupt: index=3 checksum=28 zero_hits=265755360
+Progress stayed at index 3 while zero_hits increased.
+[Inferior 1 (process 444485) killed]
+[PASS] 03_infinite_loop
+GDB exit=0
+FIX_BUG execution:
+Processing 8 items; one item has value zero.
+completed index=8 checksum=146 zero_hits=1
+FIX_BUG exit=0 (5 second external timeout was not reached)
+Manual conditional-breakpoint and next sequence: verified at source line 29; index remains 3 while zero_hits changes 0 -> 1; inferior killed; GDB exit=0.
+Post-check: no running inferior using either case executable or fixed variant remained.
+
+Reverified UTC: 2026-09-21T17:33:33.529891+00:00
+Added: debuginfod off, disable-randomization off (ASLR kept), scheduler-locking off.
+first actual interrupt: index=3 checksum=28 zero_hits=122218857
+second actual interrupt: index=3 checksum=28 zero_hits=250274480
+Progress stayed at index 3 while zero_hits increased.
+[Inferior 1 (process 446925) killed]
+[PASS] 03_infinite_loop
+GDB exit=0.
+
+Reverified UTC: 2026-09-21T17:35:22.837329+00:00
+Forward-progress correction: zero_hits is now volatile uint64_t; source line 29 unchanged.
+Both default and FIX_BUG compiled with original flags: exit=0, no diagnostics.
+first actual interrupt: index=3 checksum=28 zero_hits=153342769
+second actual interrupt: index=3 checksum=28 zero_hits=293229693
+Progress stayed at index 3 while zero_hits increased.
+[Inferior 1 (process 448852) killed]
+[PASS] 03_infinite_loop
+GDB exit=0.
+Conditional breakpoint at line 29 plus next: index=3 remains, zero_hits 0 -> 1; inferior killed; exit=0.
+FIX_BUG exit=0:
+Processing 8 items; one item has value zero.
+completed index=8 checksum=146 zero_hits=1

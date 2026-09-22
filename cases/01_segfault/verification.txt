@@ -1,0 +1,30 @@
+Environment: WSL Ubuntu-24.04; g++ 13.3.0; GDB 15.1.
+Absolute non-null addresses are replaced with <address>; PID and lines are observations, not guarantees.
+Compile: g++ -std=c++17 -O0 -g3 -fno-omit-frame-pointer -Wall -Wextra -Wpedantic -pthread cases/01_segfault/main.cpp -o build/01_segfault
+Compile exit: 0
+Inspect: gdb -q -nx -batch -x cases/01_segfault/inspect.gdb --args build/01_segfault
+GDB exit: 0
+Breakpoint 1 at <address>: file cases/01_segfault/main.cpp, line 10.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+
+Breakpoint 1, calculate_total (order=0x0) at cases/01_segfault/main.cpp:10
+10	    return order->quantity * order->unit_price;
+order = 0x0
+$1 = (const Order *) 0x0
+#0  calculate_total (order=0x0) at cases/01_segfault/main.cpp:10
+#1  <address> in process_request (order=0x0) at cases/01_segfault/main.cpp:14
+#2  <address> in main () at cases/01_segfault/main.cpp:19
+
+Program received signal SIGSEGV, Segmentation fault.
+<address> in calculate_total (order=0x0) at cases/01_segfault/main.cpp:10
+10	    return order->quantity * order->unit_price;
+#0  <address> in calculate_total (order=0x0) at cases/01_segfault/main.cpp:10
+#1  <address> in process_request (order=0x0) at cases/01_segfault/main.cpp:14
+#2  <address> in main () at cases/01_segfault/main.cpp:19
+$2 = (const Order *) 0x0
+[PASS] 01_segfault
+
+Minimal fix checked in a temporary copy; teaching source retains the bug.
+Fixed output: total=120
+Fixed exit: 0

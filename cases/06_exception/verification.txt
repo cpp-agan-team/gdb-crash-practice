@@ -1,0 +1,59 @@
+WSL Ubuntu-24.04 verification; all commands run from /home/codex/jisuanjizhishi/gdb-guide
+COMMAND: g++ -std=c++17 -O0 -g3 -fno-omit-frame-pointer -Wall -Wextra -Wpedantic -pthread cases/06_exception/main.cpp -o build/06_exception
+returncode=0
+
+COMMAND: ./build/06_exception
+returncode=-6
+terminate called after throwing an instance of 'std::runtime_error'
+  what():  worker count must be positive
+
+COMMAND: g++ -std=c++17 -O0 -g3 -fno-omit-frame-pointer -Wall -Wextra -Wpedantic -pthread -DFIX_BUG cases/06_exception/main.cpp -o build/06_exception_fixed
+returncode=0
+
+COMMAND: ./build/06_exception_fixed
+returncode=2
+configuration error: worker count must be positive
+
+COMMAND: gdb -q -nx -batch -x cases/06_exception/inspect.gdb --args build/06_exception
+returncode=0
+Catchpoint 1 (throw)
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+
+Catchpoint 1 (exception thrown), 0x00007ffff7cbb35a in __cxa_throw () from /lib/x86_64-linux-gnu/libstdc++.so.6
+#0  0x00007ffff7cbb35a in __cxa_throw () from /lib/x86_64-linux-gnu/libstdc++.so.6
+#1  0x000055555555527c in demo::parse_worker_count (raw_count=-2) at cases/06_exception/main.cpp:8
+#2  0x00005555555552bd in demo::start_server (configured_count=-2) at cases/06_exception/main.cpp:14
+#3  0x0000555555555316 in main () at cases/06_exception/main.cpp:29
+Business throw frame selected by function name; raw_count=-2
+raw_count = -2
+6	int parse_worker_count(int raw_count) {
+7	    if (raw_count <= 0) {
+8	        throw std::runtime_error("worker count must be positive");
+9	    }
+10	    return raw_count;
+11	}
+12	
+13	void start_server(int configured_count) {
+14	    const int workers = parse_worker_count(configured_count);
+15	    std::cout << "server ready: workers=" << workers << '\n';
+
+Program received signal SIGABRT, Aborted.
+__pthread_kill_implementation (no_tid=0, signo=6, threadid=<optimized out>) at ./nptl/pthread_kill.c:44
+#0  __pthread_kill_implementation (no_tid=0, signo=6, threadid=<optimized out>) at ./nptl/pthread_kill.c:44
+#1  __pthread_kill_internal (signo=6, threadid=<optimized out>) at ./nptl/pthread_kill.c:78
+#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:89
+#3  0x00007ffff784527e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26
+#4  0x00007ffff78288ff in __GI_abort () at ./stdlib/abort.c:79
+#5  0x00007ffff7ca5ff5 in ?? () from /lib/x86_64-linux-gnu/libstdc++.so.6
+#6  0x00007ffff7cbb0da in ?? () from /lib/x86_64-linux-gnu/libstdc++.so.6
+#7  0x00007ffff7ca5a55 in std::terminate() () from /lib/x86_64-linux-gnu/libstdc++.so.6
+#8  0x00007ffff7cbb391 in __cxa_throw () from /lib/x86_64-linux-gnu/libstdc++.so.6
+#9  0x000055555555527c in demo::parse_worker_count (raw_count=-2) at cases/06_exception/main.cpp:8
+#10 0x00005555555552bd in demo::start_server (configured_count=-2) at cases/06_exception/main.cpp:14
+#11 0x0000555555555316 in main () at cases/06_exception/main.cpp:29
+[Inferior 1 (process 443829) killed]
+[PASS] 06_exception
+terminate called after throwing an instance of 'std::runtime_error'
+  what():  worker count must be positive
+warning: 44	./nptl/pthread_kill.c: No such file or directory

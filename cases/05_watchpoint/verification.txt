@@ -1,0 +1,57 @@
+WSL Ubuntu-24.04 verification; all commands run from /home/codex/jisuanjizhishi/gdb-guide
+COMMAND: g++ -std=c++17 -O0 -g3 -fno-omit-frame-pointer -Wall -Wextra -Wpedantic -pthread cases/05_watchpoint/main.cpp -o build/05_watchpoint
+returncode=0
+
+COMMAND: ./build/05_watchpoint
+returncode=1
+total=30 expected=270
+
+COMMAND: g++ -std=c++17 -O0 -g3 -fno-omit-frame-pointer -Wall -Wextra -Wpedantic -pthread -DFIX_BUG cases/05_watchpoint/main.cpp -o build/05_watchpoint_fixed
+returncode=0
+
+COMMAND: ./build/05_watchpoint_fixed
+returncode=0
+total=270 expected=270
+
+COMMAND: gdb -q -nx -batch -x cases/05_watchpoint/inspect.gdb --args build/05_watchpoint
+returncode=0
+Breakpoint 1 at 0x11b5: file cases/05_watchpoint/main.cpp, line 13.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+
+Breakpoint 1, demo::ready_for_watch (invoice=...) at cases/05_watchpoint/main.cpp:13
+13	}
+$1 = (demo::Invoice &) @0x7fffffffe6ac: {
+  quantity = 3,
+  unit_price = 100,
+  total = 300
+}
+Hardware watchpoint 2: -location *$total_address
+
+Hardware watchpoint 2: -location *$total_address
+
+Old value = 300
+New value = 30
+demo::apply_discount (invoice=..., discount=30) at cases/05_watchpoint/main.cpp:21
+21	}
+#0  demo::apply_discount (invoice=..., discount=30) at cases/05_watchpoint/main.cpp:21
+#1  0x0000555555555228 in main () at cases/05_watchpoint/main.cpp:28
+invoice = @0x7fffffffe6ac: {
+  quantity = 3,
+  unit_price = 100,
+  total = 30
+}
+discount = 30
+16	#ifdef FIX_BUG
+17	    invoice.total -= discount;
+18	#else
+19	    invoice.total = discount;  // BUG: overwrite the total instead of subtracting.
+20	#endif
+21	}
+22	}  // namespace demo
+23	
+24	int main() {
+25	    demo::Invoice invoice{3, 100, 300};
+total=30 expected=270
+[Inferior 1 (process 443798) exited with code 01]
+[PASS] 05_watchpoint

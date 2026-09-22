@@ -1,0 +1,25 @@
+Verified UTC: 2026-09-21T17:32:11.161335+00:00
+Environment: WSL Ubuntu-24.04, g++ 13.3.0, GDB 15.1
+Compile flags: -std=c++17 -O0 -g3 -fno-omit-frame-pointer -Wall -Wextra -Wpedantic -pthread
+Default and FIX_BUG builds: exit=0, no compiler diagnostics
+GDB command: gdb -q -nx -batch -x cases/02_deadlock/inspect.gdb --args build/02_deadlock
+worker=2 GDB-thread=3 Linux-TID=444440 held=0x5555555591e0 waiting=0x5555555591a0
+worker=1 GDB-thread=2 Linux-TID=444439 held=0x5555555591a0 waiting=0x5555555591e0
+glibc owners verified: left=444439 right=444440
+[Inferior 1 (process 444436) killed]
+[PASS] 02_deadlock
+GDB exit=0
+FIX_BUG execution:
+Two workers acquire the same mutex pair in opposite orders.
+Both workers completed.
+FIX_BUG exit=0 (5 second external timeout was not reached)
+Post-check: no running inferior using either case executable or fixed variant remained.
+
+Reverified UTC: 2026-09-21T17:33:32.937370+00:00
+Added: debuginfod off, disable-randomization off (ASLR kept), scheduler-locking off.
+worker=2 GDB-thread=3 Linux-TID=446910 held=0x5658193211e0 waiting=0x5658193211a0
+worker=1 GDB-thread=2 Linux-TID=446909 held=0x5658193211a0 waiting=0x5658193211e0
+glibc owners verified: left=446909 right=446910
+[Inferior 1 (process 446903) killed]
+[PASS] 02_deadlock
+GDB exit=0.

@@ -1,0 +1,36 @@
+Environment: WSL Ubuntu-24.04; g++ 13.3.0; GDB 15.1.
+Absolute non-null addresses are replaced with <address>; PID and lines are observations, not guarantees.
+Compile: g++ -std=c++17 -O0 -g3 -fno-omit-frame-pointer -Wall -Wextra -Wpedantic -pthread cases/04_wrong_result/main.cpp -o build/04_wrong_result
+Compile exit: 0
+Inspect: gdb -q -nx -batch -x cases/04_wrong_result/inspect.gdb --args build/04_wrong_result
+GDB exit: 0
+Breakpoint 1 at <address>: file cases/04_wrong_result/main.cpp, line 6.
+Breakpoint 2 at <address>: file cases/04_wrong_result/main.cpp, line 18.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+
+Breakpoint 1, divide_total (total=47, count=4) at cases/04_wrong_result/main.cpp:6
+6	    return total / count;
+total = 47
+count = 4
+type = int
+type = int
+$1 = 11
+$2 = 11.75
+#0  divide_total (total=47, count=4) at cases/04_wrong_result/main.cpp:6
+#1  <address> in average_score (values=<address>, count=4) at cases/04_wrong_result/main.cpp:14
+#2  <address> in main () at cases/04_wrong_result/main.cpp:25
+average_score (values=<address>, count=4) at cases/04_wrong_result/main.cpp:15
+15	}
+Value returned is $3 = 11
+
+Breakpoint 2, display_result (actual=11) at cases/04_wrong_result/main.cpp:18
+18	    const double expected = 11.75;
+$4 = 11
+actual=11 expected=11.75 match=false
+[Inferior 1 (process 441910) exited normally]
+[PASS] 04_wrong_result
+
+Minimal fix checked in a temporary copy; teaching source retains the bug.
+Fixed output: actual=11.75 expected=11.75 match=true
+Fixed exit: 0
